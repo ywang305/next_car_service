@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Box, TextField, Button } from '@material-ui/core';
-import { signInWithGoogle } from '../../lib/firebase';
+import { signInWithGoogle } from '../../lib/firebase/auth';
 
 const clickHandler = async () => {
 	const result = await signInWithGoogle();
