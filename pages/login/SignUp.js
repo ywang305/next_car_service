@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, Button } from '@material-ui/core';
+import { Box, TextField, Button, Container } from '@material-ui/core';
 import Layout from '../../components/layout';
 import { signUpWithEmailPassword } from '../../lib/firebase/auth';
 
@@ -47,7 +47,7 @@ export default function SignUp() {
 
 	return (
 		<Layout>
-			<Box width={1} maxWidth={600}>
+			<Container maxWidth='xs'>
 				<form onSubmit={submitHandler} onChange={changeHandler}>
 					<TextField
 						name='email'
@@ -84,7 +84,7 @@ export default function SignUp() {
 						</Button>
 					</Box>
 				</form>
-			</Box>
+			</Container>
 		</Layout>
 	);
 }

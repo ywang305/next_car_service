@@ -1,6 +1,8 @@
 import React, { useMemo, useCallback, useState } from 'react';
 import Head from 'next/head';
 import Appbar from '../appbar/Appbar';
+import CssBaseline from '@material-ui/core/CssBaseline';
+
 export default function Layout({ children, title = '' }) {
 	return (
 		<div>
@@ -13,18 +15,19 @@ export default function Layout({ children, title = '' }) {
 			<header>
 				<Appbar />
 			</header>
+			<CssBaseline />
 
 			{children}
 
-			<footer>
+			{/* <footer style={{ display: 'flex', justifyContent: 'center' }}>
 				<a
-					href='https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app'
+					href='http://github.com/ywang305'
 					target='_blank'
 					rel='noopener noreferrer'
 				>
-					Powered by Vercel
+					Yao's github
 				</a>
-			</footer>
+			</footer> */}
 		</div>
 	);
 }

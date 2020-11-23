@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Box, TextField, Button } from '@material-ui/core';
 import { signInWithEmailPassword } from '../../lib/firebase/auth';
+import EmailIcon from '@material-ui/icons/Email';
 
 const useSignin = () => {
 	const [fields, setFields] = useState({ email: '', password: '' });
@@ -44,7 +45,13 @@ const EmailPassword = ({ useHook = useSignin }) => {
 				fullWidth
 			/>
 			<Box mt={2}>
-				<Button fullWidth type='submit'>
+				<Button
+					fullWidth
+					color='primary'
+					variant='contained'
+					type='submit'
+					startIcon={<EmailIcon />}
+				>
 					Sign In
 				</Button>
 			</Box>
