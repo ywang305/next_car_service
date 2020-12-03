@@ -8,6 +8,7 @@ import {
 	indigo,
 	red,
 	purple,
+	lightBlue,
 	lightGreen,
 	lime,
 	yellow,
@@ -15,14 +16,14 @@ import {
 	deepPurple,
 	deepOrange,
 } from '@material-ui/core/colors';
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/lib/integration/react';
-import { persistor, store } from '../lib/store/store';
+// import { Provider } from 'react-redux';
+// import { PersistGate } from 'redux-persist/lib/integration/react';
+// import { persistor, store } from '../lib/store/store';
 
 const theme = createMuiTheme({
 	palette: {
-		primary: indigo,
-		secondary: deepOrange,
+		primary: deepOrange,
+		secondary: lime,
 	},
 	typography: {
 		// In Chinese and Japanese the characters are usually larger,
@@ -34,13 +35,13 @@ const theme = createMuiTheme({
 export default function MyApp({ Component, pageProps }) {
 	return (
 		<div>
-			<Provider store={store}>
-				<PersistGate persistor={persistor} loading={null}>
+			{/* <Provider store={store}>
+				<PersistGate persistor={persistor} loading={null}> */}
 					<MuiThemeProvider theme={theme}>
 						<Component {...pageProps} />
 					</MuiThemeProvider>
-				</PersistGate>
-			</Provider>
+				{/* </PersistGate>
+			</Provider> */}
 		</div>
 	);
 }

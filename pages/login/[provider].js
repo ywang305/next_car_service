@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Box, IconButton, Divider } from '@material-ui/core';
+import { Container, Box, IconButton, Divider, Typography } from '@material-ui/core';
 import EmailPassword from '../../components/login/EmailPassword';
 import Google, { GIcon } from '../../components/login/Google';
 import Phone from '../../components/login/Phone';
@@ -19,6 +19,7 @@ export default function LoginPage({ provider }) {
 					<Component />
 				</Box>
 				<Divider />
+				<Typography color='textSecondary'>or sign in with</Typography>
 				{alternatives.map((a) => {
 					const { Icon, provider, href } = a;
 					return (
