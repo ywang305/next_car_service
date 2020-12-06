@@ -20,6 +20,7 @@ const Phone = () => {
         }
     }, [containerRef.current]);
 
+    // TODO: use Rect-Query with ajax status here
     const requestCode = async () => {
         const normalPhoneNum = ('+' + ('1' + phone).slice(-11)).slice(-12);
         const confirmationResult = await signInWithPhone(
