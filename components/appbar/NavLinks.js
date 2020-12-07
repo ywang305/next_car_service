@@ -25,6 +25,7 @@ import {
     LocalAtmOutlined,
 } from '@material-ui/icons';
 import { selectIsLogin } from '../../lib/store/loginSlice';
+import LogoutAlert from '../alert/LogoutAlert';
 import { useSelector } from 'react-redux';
 
 const data = [
@@ -60,31 +61,64 @@ const data = [
     {
         label: 'Logout',
         icon: <ExitToAppOutlined />,
-        to: '/logout',
+        to: null,
     },
 ];
+
+const LogoutItem = ({ mobile, icon, label }) => {
+    const [open, setOpen] = useState(false);
+    const toggleOpen = () => setOpen((t) => !t);
+
+    return (
+        <div>
+            {mobile ? (
+                <ListItem button onClick={toggleOpen}>
+                    <ListItemIcon>{icon}</ListItemIcon>
+                    <ListItemText primary={label} />
+                </ListItem>
+            ) : (
+                <Tooltip title={label}>
+                    <IconButton
+                        color='inherit'
+                        aria-label={label}
+                        onClick={toggleOpen}
+                    >
+                        {icon}
+                    </IconButton>
+                </Tooltip>
+            )}
+            <LogoutAlert open={open} toggleOpen={toggleOpen} signOut={null} />
+        </div>
+    );
+};
 
 export const WebNavLinks = ({ mobile = false }) => {
     const isLogin = useSelector(selectIsLogin);
 
     return data
         .filter((d) => (isLogin ? d.to !== '/login' : d.to !== '/profile'))
-        .map(({ label, icon, to }) => (
-            <Link href={to} key={to}>
-                {!mobile ? (
-                    <Tooltip title={label}>
-                        <IconButton color='inherit' aria-label={label}>
-                            {icon}
-                        </IconButton>
-                    </Tooltip>
-                ) : (
-                    <ListItem button>
-                        <ListItemIcon>{icon}</ListItemIcon>
-                        <ListItemText primary={label} />
-                    </ListItem>
-                )}
-            </Link>
-        ));
+        .map((props) => {
+            const { label, icon, to } = props;
+            if (label === 'Logout') {
+                return <LogoutItem mobile={mobile} key={label} {...props} />;
+            }
+            return (
+                <Link href={to} key={label}>
+                    {!mobile ? (
+                        <Tooltip title={label}>
+                            <IconButton color='inherit' aria-label={label}>
+                                {icon}
+                            </IconButton>
+                        </Tooltip>
+                    ) : (
+                        <ListItem button>
+                            <ListItemIcon>{icon}</ListItemIcon>
+                            <ListItemText primary={label} />
+                        </ListItem>
+                    )}
+                </Link>
+            );
+        });
 };
 
 export const MobileNavLinks = () => {

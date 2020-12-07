@@ -1,42 +1,70 @@
 import React, { useState, useRef, useMemo } from 'react';
-import { Box, Button, TextField } from '@material-ui/core';
+import { Box, Button, TextField, CircularProgress } from '@material-ui/core';
 import PhoneIcon from '@material-ui/icons/Phone';
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
+import { useRouter } from 'next/router';
+import { useDispatch, useSelector } from 'react-redux';
 import { RecaptchaVerifier } from '../../lib/firebase/firebase_app';
 import { signInWithPhone, requestVerifyCode } from '../../lib/firebase/auth';
+import {
+    signInWithVerifyCodeThunk,
+    selectStatus,
+} from '../../lib/store/loginSlice';
 
 const Phone = () => {
     const [phone, setPhone] = useState('');
     const [code, setCode] = useState('');
-    const confirm = useRef(null);
-    const containerRef = useRef(null);
+    const [confirmationResult, setConfirmationResult] = useState(null);
+    const [phoneStatus, setPhoneStatus] = useState({
+        loading: false,
+        error: '',
+    });
+    const [verifyError, setVerifyError] = useState(null);
+
+    const buttonRef = useRef(null);
 
     const recaptchaVerifier = useMemo(() => {
-        if (containerRef.current) {
-            return new RecaptchaVerifier(containerRef.current, {
+        if (buttonRef.current) {
+            return new RecaptchaVerifier(buttonRef.current, {
                 size: 'invisible',
-                // other options
             });
         }
-    }, [containerRef.current]);
+    }, [buttonRef.current]);
 
-    // TODO: use Rect-Query with ajax status here
     const requestCode = async () => {
-        const normalPhoneNum = ('+' + ('1' + phone).slice(-11)).slice(-12);
-        const confirmationResult = await signInWithPhone(
-            normalPhoneNum,
-            recaptchaVerifier
-        );
-        if (confirmationResult) {
-            confirm.current = confirmationResult;
+        setConfirmationResult(null);
+        const phoneNum = ('+1' + phone).slice(-12);
+        try {
+            setPhoneStatus({ loading: true, error: '' });
+            const confirmationResult = await signInWithPhone(
+                phoneNum,
+                recaptchaVerifier
+            );
+            if (confirmationResult) {
+                setConfirmationResult(confirmationResult);
+            }
+        } catch (err) {
+            const { code, message } = err;
+            setPhoneStatus({ loading: false, error: code + ' ' + message });
+        } finally {
+            setPhoneStatus((p) => ({ ...p, loading: false }));
         }
     };
+    const router = useRouter();
+    const dispatch = useDispatch();
     const verifyCode = async () => {
-        console.log('siginWithCode: ', confirm.current, code);
-        if (!confirm.current) return;
-        const user = await requestVerifyCode(confirm.current, code);
-        console.log('sigin done with code: ', user);
+        const resultAction = await dispatch(
+            signInWithVerifyCodeThunk({ confirmationResult, code })
+        );
+        if (resultAction.error) {
+            // to see use unwrappedResult, check Password component
+            setVerifyError(resultAction.error);
+        } else {
+            router.replace('/');
+        }
     };
+
+    const isVerifyLoading = useSelector(selectStatus) === 'loading';
 
     return (
         <div>
@@ -48,17 +76,28 @@ const Phone = () => {
                     margin='normal'
                     value={phone}
                     onChange={(e) => {
-                        setPhone(e.target.value);
+                        const { value } = e.target;
+                        setPhone(value);
+                        setPhoneStatus((s) => ({ ...s, error: '' }));
                     }}
                     required
                     fullWidth
+                    helperText={phoneStatus.error}
+                    error={Boolean(phoneStatus.error)}
                 />
                 <Button
                     color='primary'
                     variant='outlined'
-                    ref={containerRef}
-                    startIcon={<PhoneIcon />}
+                    ref={buttonRef}
+                    startIcon={
+                        phoneStatus.loading ? (
+                            <CircularProgress color='secondary' />
+                        ) : (
+                            <PhoneIcon />
+                        )
+                    }
                     onClick={requestCode}
+                    disabled={phoneStatus.loading}
                 >
                     Get Code
                 </Button>
@@ -69,17 +108,24 @@ const Phone = () => {
                     placeholder=''
                     margin='normal'
                     value={code}
-                    onChange={(e) => setCode(e.target.value)}
+                    onChange={(e) => {
+                        setCode(e.target.value);
+                        if (verifyError) {
+                            setVerifyError(null);
+                        }
+                    }}
                     required
                     fullWidth
-                    disabled={phone?.length < 10}
+                    disabled={!confirmationResult}
+                    error={verifyError}
+                    helperText={verifyError?.message}
                 />
                 <Button
                     color='primary'
                     variant='contained'
                     startIcon={<VerifiedUserIcon />}
                     onClick={verifyCode}
-                    disabled={phone?.length < 10}
+                    disabled={!confirmationResult || isVerifyLoading}
                 >
                     Sign In with SMS Code
                 </Button>
