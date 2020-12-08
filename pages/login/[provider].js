@@ -47,6 +47,7 @@ export default function LoginPage({ provider = options[0].provider }) {
     );
 }
 
+// TODO +email provier
 export const options = [
     {
         provider: 'password',
