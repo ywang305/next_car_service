@@ -22,11 +22,6 @@ import {
 import useDevice from '../../lib/hooks/useDevice';
 import { WebNavLinks, MobileNavLinks } from './NavLinks';
 
-const useUserId = () => {
-    const userId = useSelector((state) => state.login.userId);
-    return [userId];
-};
-
 const useDrawer = () => {
     const [open, setOpen] = useState(false);
     const toggleDrawer = useCallback((event) => {
@@ -83,7 +78,7 @@ export function Appbar() {
                     display='flex'
                     alignItems='center'
                 >
-                    <Avatar alt='HadesFlower' src='/logo.jpg' />
+                    <Avatar alt='logo' src='/next_car_logo.png' />
                     <Box ml={1}>
                         <Typography variant='h6'>{brand}</Typography>
                     </Box>

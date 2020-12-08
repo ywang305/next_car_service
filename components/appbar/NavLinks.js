@@ -24,9 +24,9 @@ import {
     ExitToAppOutlined,
     LocalAtmOutlined,
 } from '@material-ui/icons';
-import { selectIsLogin } from '../../lib/store/loginSlice';
-import LogoutAlert from '../alert/LogoutAlert';
-import { useSelector } from 'react-redux';
+import { selectIsLogin, signOutThunk } from '../../lib/store/loginSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import LogoutItem from './LogoutItem';
 
 const data = [
     {
@@ -65,38 +65,15 @@ const data = [
     },
 ];
 
-const LogoutItem = ({ mobile, icon, label }) => {
-    const [open, setOpen] = useState(false);
-    const toggleOpen = () => setOpen((t) => !t);
-
-    return (
-        <div>
-            {mobile ? (
-                <ListItem button onClick={toggleOpen}>
-                    <ListItemIcon>{icon}</ListItemIcon>
-                    <ListItemText primary={label} />
-                </ListItem>
-            ) : (
-                <Tooltip title={label}>
-                    <IconButton
-                        color='inherit'
-                        aria-label={label}
-                        onClick={toggleOpen}
-                    >
-                        {icon}
-                    </IconButton>
-                </Tooltip>
-            )}
-            <LogoutAlert open={open} toggleOpen={toggleOpen} signOut={null} />
-        </div>
-    );
-};
-
 export const WebNavLinks = ({ mobile = false }) => {
     const isLogin = useSelector(selectIsLogin);
 
     return data
-        .filter((d) => (isLogin ? d.to !== '/login' : d.to !== '/profile'))
+        .filter((d) =>
+            isLogin
+                ? d.label !== 'Login'
+                : !['Profile', 'Logout'].some((label) => label === d.label)
+        )
         .map((props) => {
             const { label, icon, to } = props;
             if (label === 'Logout') {

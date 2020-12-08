@@ -6,9 +6,12 @@ import {
     signInWithEmailPasswordThunk,
     selectIsLoading,
 } from '../../lib/store/loginSlice';
-import KeyIcon from '@material-ui/icons/VpnKey';
+import Email_Icon from '@material-ui/icons/Email';
 import { useRouter } from 'next/router';
 
+export const EmailIcon = Email_Icon;
+
+//TODO email sigin logic
 const useSignin = () => {
     const [fields, setFields] = useState({ email: '', password: '' });
     const [error, setError] = useState(null);
@@ -43,7 +46,8 @@ const useSignin = () => {
     return [fields.email, fields.password, changeHandler, submitHandler, error];
 };
 
-const Password = ({ useHook = useSignin }) => {
+// TODO Email UI
+const Email = ({ useHook = useSignin }) => {
     const [email, password, changeHandler, submitHandler, error] = useHook();
     const isLoading = useSelector(selectIsLoading);
     const isPassError = error && /password/i.test(error.code);
@@ -89,6 +93,4 @@ const Password = ({ useHook = useSignin }) => {
         </form>
     );
 };
-export default Password;
-
-export const PasswordIcon = KeyIcon;
+export default Email;

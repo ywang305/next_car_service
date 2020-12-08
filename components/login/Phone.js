@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { Box, Button, TextField, CircularProgress } from '@material-ui/core';
-import PhoneIcon from '@material-ui/icons/Phone';
+import Phone_Icon from '@material-ui/icons/Phone';
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,8 +8,10 @@ import { RecaptchaVerifier } from '../../lib/firebase/firebase_app';
 import { signInWithPhone, requestVerifyCode } from '../../lib/firebase/auth';
 import {
     signInWithVerifyCodeThunk,
-    selectStatus,
+    selectIsLoading,
 } from '../../lib/store/loginSlice';
+
+export const PhoneIcon = Phone_Icon;
 
 const Phone = () => {
     const [phone, setPhone] = useState('');
@@ -64,7 +66,7 @@ const Phone = () => {
         }
     };
 
-    const isVerifyLoading = useSelector(selectStatus) === 'loading';
+    const isVerifyLoading = useSelector(selectIsLoading);
 
     return (
         <div>

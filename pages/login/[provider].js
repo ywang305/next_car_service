@@ -7,31 +7,30 @@ import {
     Typography,
     Tooltip,
 } from '@material-ui/core';
-import Password from '../../components/login/Password';
-import Google, { GIcon } from '../../components/login/Google';
-import Phone from '../../components/login/Phone';
+import Password, { PasswordIcon } from '../../components/login/Password';
+import Google from '../../components/login/Google';
+import Phone, { PhoneIcon } from '../../components/login/Phone';
 import Layout from '../../components/layout';
-import EmailIcon from '@material-ui/icons/Email';
-import PhoneIcon from '@material-ui/icons/Phone';
-import KeyIcon from '@material-ui/icons/VpnKey';
+
 import Link from 'next/link';
 
 export default function LoginPage({ provider = options[0].provider }) {
-    const { ProviderComponent } = options.find((x) => x.provider === provider);
+    const { Provider } = options.find((x) => x.provider === provider);
     const alternatives = options.filter((x) => x.provider !== provider);
 
     return (
         <Layout>
             <Container maxWidth='xs'>
                 <Box pt={6} pb={2} aria-label='provider-box'>
-                    <ProviderComponent />
+                    <Provider />
                 </Box>
                 <Divider />
                 <br />
                 <Typography color='textSecondary'>or sign in with</Typography>
                 {alternatives.map((a) => {
-                    const { Icon, provider, href } = a;
-                    return (
+                    const { Icon, Provider, provider, href } = a;
+
+                    return href ? (
                         <Link href={href} key={provider}>
                             <Tooltip title={provider}>
                                 <IconButton color='primary'>
@@ -39,6 +38,8 @@ export default function LoginPage({ provider = options[0].provider }) {
                                 </IconButton>
                             </Tooltip>
                         </Link>
+                    ) : (
+                        <Provider key={provider} />
                     );
                 })}
             </Container>
@@ -49,27 +50,27 @@ export default function LoginPage({ provider = options[0].provider }) {
 export const options = [
     {
         provider: 'password',
-        ProviderComponent: Password,
-        Icon: KeyIcon,
+        Provider: Password,
+        Icon: PasswordIcon,
         href: '/login/password',
     },
     {
         provider: 'phone',
-        ProviderComponent: Phone,
+        Provider: Phone,
         Icon: PhoneIcon,
         href: '/login/phone',
     },
     {
         provider: 'google',
-        ProviderComponent: Google,
-        Icon: GIcon,
-        href: '/login/google',
+        Provider: Google,
     },
 ];
 
 export async function getStaticPaths() {
     // Call an external API endpoint to get posts
-    const paths = options.map((x) => ({ params: { provider: x.provider } }));
+    const paths = options
+        .filter((x) => x.href)
+        .map((x) => ({ params: { provider: x.provider } }));
 
     // We'll pre-render only these paths at build time.
     // { fallback: false } means other routes should 404.
