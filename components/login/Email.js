@@ -5,20 +5,22 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import {
     signInWithEmailPasswordThunk,
     selectIsLoading,
+    login,
 } from '../../lib/store/loginSlice';
 import Email_Icon from '@material-ui/icons/Email';
 import { useRouter } from 'next/router';
+import { sendLinkToEmail, signInWithEmailLink } from '../../lib/firebase/auth';
+import { RouterRounded } from '@material-ui/icons';
 
 export const EmailIcon = Email_Icon;
 
-//TODO email sigin logic
 const useSignin = () => {
-    const [fields, setFields] = useState({ email: '', password: '' });
+    const [email, setEmail] = useState('');
     const [error, setError] = useState(null);
 
     const changeHandler = (e) => {
-        const { name, value } = e.target;
-        setFields((f) => ({ ...f, [name]: value }));
+        const { value } = e.target;
+        setEmail(value);
         if (error) {
             setError(null);
         }
@@ -27,35 +29,44 @@ const useSignin = () => {
     const router = useRouter();
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        (async () => {
+            const result = await signInWithEmailLink();
+            if (result?.user) {
+                dispatch(login());
+                router.replace('/');
+            }
+        })();
+    }, []);
+
     const submitHandler = async (e) => {
         e.preventDefault();
-        const { email, password } = fields;
-        const resultAction = await dispatch(
-            signInWithEmailPasswordThunk({ email, password })
-        );
-        try {
-            // usually its return const {error, payload} = resultAction,
-            // if need exception style, use unwrapResult helper
-            const payload = unwrapResult(resultAction);
-            router.replace('/');
-        } catch (err) {
-            // unwrapResult is used to throw exception, otherwise, payload is null without exception if not using wunwrapResult
-            setError(err);
-        }
+        await sendLinkToEmail(email);
+        // const resultAction = await dispatch(
+        //     thunk
+        // );
+        // try {
+        //     // usually its return const {error, payload} = resultAction,
+        //     // if need exception style, use unwrapResult helper
+        //     const payload = unwrapResult(resultAction);
+        //     router.replace('/');
+        // } catch (err) {
+        //     // unwrapResult is used to throw exception, otherwise, payload is null without exception if not using wunwrapResult
+        //     setError(err);
+        // }
     };
-    return [fields.email, fields.password, changeHandler, submitHandler, error];
+    return [email, changeHandler, submitHandler, error];
 };
 
-// TODO Email UI
 const Email = ({ useHook = useSignin }) => {
-    const [email, password, changeHandler, submitHandler, error] = useHook();
-    const isLoading = useSelector(selectIsLoading);
-    const isPassError = error && /password/i.test(error.code);
-    const isEmailError = error && !isPassError;
+    const [email, changeHandler, submitHandler, error] = useHook();
+    const isLoading = false; // useSelector(selectIsLoading);
+    const isSrvError = Boolean(error);
 
     return (
         <form onSubmit={submitHandler} onChange={changeHandler}>
             <TextField
+                type='email'
                 name='email'
                 label='Email'
                 placeholder=''
@@ -63,20 +74,8 @@ const Email = ({ useHook = useSignin }) => {
                 value={email}
                 required
                 fullWidth
-                error={isEmailError}
-                helperText={isEmailError && error?.message}
-            />
-            <TextField
-                name='password'
-                label='Password'
-                type='password'
-                autoComplete='current-password'
-                margin='normal'
-                value={password}
-                required
-                fullWidth
-                error={isPassError}
-                helperText={isPassError && error?.message}
+                error={isSrvError}
+                helperText={isSrvError && error?.message}
             />
             <Box mt={2}>
                 <Button
@@ -84,10 +83,10 @@ const Email = ({ useHook = useSignin }) => {
                     color='primary'
                     variant='contained'
                     type='submit'
-                    startIcon={isLoading ? <CircularProgress /> : <KeyIcon />}
+                    startIcon={isLoading ? <CircularProgress /> : <EmailIcon />}
                     disabled={isLoading}
                 >
-                    Sign In
+                    Send Link To Email
                 </Button>
             </Box>
         </form>

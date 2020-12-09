@@ -46,7 +46,7 @@ const useSignin = () => {
 const Password = ({ useHook = useSignin }) => {
     const [email, password, changeHandler, submitHandler, error] = useHook();
     const isLoading = useSelector(selectIsLoading);
-    const isPassError = error && /password/i.test(error.code);
+    const isPassError = error && /password/i.test(error?.code);
     const isEmailError = error && !isPassError;
 
     return (
@@ -54,6 +54,7 @@ const Password = ({ useHook = useSignin }) => {
             <TextField
                 name='email'
                 label='Email'
+                type='email'
                 placeholder=''
                 margin='normal'
                 value={email}
