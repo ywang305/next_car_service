@@ -43,6 +43,9 @@ export default function LoginPage({ provider = options[0].provider }) {
                         <Provider key={provider} />
                     );
                 })}
+                <Divider />
+                <br />
+                <Link href={'/login/SignUp'}>Sign Up</Link>
             </Container>
         </Layout>
     );

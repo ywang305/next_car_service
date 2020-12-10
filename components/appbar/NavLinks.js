@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
     Button,
@@ -27,6 +27,26 @@ import {
 import { selectIsLogin, signOutThunk } from '../../lib/store/loginSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import LogoutItem from './LogoutItem';
+import { auth } from '../../lib/firebase/firebase_app';
+import Image from 'next/image';
+
+const UserPhoto = () => {
+    const [name, setName] = useState(null);
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            if (user) {
+                if (user.displayName) {
+                    setName(user.displayName.slice(0, 2));
+                } else if (user.email) {
+                    setName(user.email.slice(0, 1));
+                }
+            }
+        });
+
+        return unsubscribe();
+    }, []);
+    return <Avatar>{name ? name : <Face />}</Avatar>;
+};
 
 const data = [
     {
@@ -36,11 +56,7 @@ const data = [
     },
     {
         label: 'Profile',
-        icon: (
-            <Avatar>
-                <Face />
-            </Avatar>
-        ),
+        icon: <UserPhoto />,
         to: '/profile',
     },
     {
