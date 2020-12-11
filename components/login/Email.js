@@ -2,17 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Box, TextField, Button, CircularProgress } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
-import {
-    signInWithEmailPasswordThunk,
-    selectIsLoading,
-    login,
-} from '../../lib/store/loginSlice';
-import Email_Icon from '@material-ui/icons/Email';
+import { login } from '../../lib/store/loginSlice';
+import EmailIcon from '@material-ui/icons/Email';
 import { useRouter } from 'next/router';
 import { sendLinkToEmail, signInWithEmailLink } from '../../lib/firebase/auth';
-import { RouterRounded } from '@material-ui/icons';
 
-export const EmailIcon = Email_Icon;
+export const Icon = EmailIcon;
 
 const useSignin = () => {
     const [email, setEmail] = useState('');

@@ -62,7 +62,7 @@ const data = [
     {
         label: 'New Ride',
         icon: <ReplayOutlined />,
-        to: '/reservation',
+        to: '/reserve',
     },
     {
         label: 'Payment',

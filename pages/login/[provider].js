@@ -10,7 +10,7 @@ import {
 import Password, { PasswordIcon } from '../../components/login/Password';
 import Google from '../../components/login/Google';
 import Phone, { PhoneIcon } from '../../components/login/Phone';
-import Email, { EmailIcon } from '../../components/login/Email';
+import Email, { Icon as EmailIcon } from '../../components/login/Email';
 import Layout from '../../components/layout';
 
 import Link from 'next/link';
