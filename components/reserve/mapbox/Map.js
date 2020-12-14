@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, createContext } from 'react';
 import Head from 'next/head';
 import styles from './map.module.css';
+import { Box } from '@material-ui/core';
 import CentralMarker from './CentralMarker';
 import { mapboxgl } from './mbx-config';
 
@@ -33,11 +34,10 @@ export default function Map({ children }) {
                 />
             </Head>
             <MapContext.Provider value={map}>
-                <div>
+                <Box aria-label='mapcontext rooter' position='relative'>
                     <div ref={mapContainerEl} className={styles.mapContainer} />
-                </div>
-                <CentralMarker />
-                {children}
+                    {children}
+                </Box>
             </MapContext.Provider>
         </div>
     );
