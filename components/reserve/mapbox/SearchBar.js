@@ -78,6 +78,18 @@ const useOptions = () => {
     return [value, inputValue, setValue, setInputValue, options];
 };
 
+function createPuMarker(pickup, color = '#0000ff') {
+    return new Marker({ color }).setLngLat(pickup.center).setPopup(
+        new Popup().setHTML(
+            `<p>${pickup.place_name}</p>
+            <p>GPS:${JSON.stringify(pickup.center)}</p>`
+        )
+    );
+}
+function createDoMarker(dropoff, color = '#ff0000') {
+    return createPuMarker(dropoff, color);
+}
+
 const useStore = (label) => {
     const pickup = useSelector(selectPickup);
     const dropoff = useSelector(selectDropoff);
@@ -86,21 +98,33 @@ const useStore = (label) => {
 
     const map = useContext(MapContext);
     useEffect(() => {
-        if (pickup?.center) {
-            const { center } = pickup;
+        let puMarker, doMarker;
+        if (pickup?.center && !dropoff?.center) {
+            const center = pickup.center;
 
-            new Marker({ color: '#0000ff' })
-                .setLngLat(center)
-                .setPopup(
-                    new Popup().setHTML(
-                        `<p>${pickup.place_name}</p>
-                        <p>GPS:${JSON.stringify(center)}</p>`
-                    )
-                )
-                .addTo(map);
+            puMarker = createPuMarker(pickup).addTo(map);
             map.flyTo({ center, zoom: 13 });
+        } else if (!pickup?.center && dropoff?.center) {
+            const center = dropoff.center;
+            doMarker = createDoMarker(dropoff).addTo(map);
+
+            map.flyTo({ center, zoom: 13 });
+        } else if (pickup?.center && dropoff?.center) {
+            puMarker = createPuMarker(pickup).addTo(map);
+            doMarker = createDoMarker(dropoff).addTo(map);
+
+            const { lng: lngPu, lat: latPu } = pickup.center;
+            const { lng: lngDo, lat: latDo } = dropoff.center;
+            const sw = [Math.min(lngPu, lngDo), Math.min(latPu, latDo)];
+            const ne = [Math.max(lngPu, lngDo), Math.max(latPu, latDo)];
+            map.fitBounds([sw, ne], { padding: 64 });
         }
-    }, [pickup]);
+
+        return () => {
+            puMarker?.remove();
+            doMarker?.remove();
+        };
+    }, [pickup, dropoff]);
 
     const dispatch = useDispatch();
     const saveToStore = (newAddress) => {
