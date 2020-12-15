@@ -21,11 +21,12 @@ import {
     selectPickup,
     selectDropoff,
 } from '../../../lib/store/reserveSlice';
+import { Marker, Popup } from 'mapbox-gl';
 
 // TODO search bar logic
 const useOptions = () => {
     const [options, setOptions] = useState([]);
-    const [value, setValue] = React.useState(options[0]);
+    const [value, setValue] = React.useState(null);
     const [inputValue, setInputValue] = React.useState('');
     const map = useContext(MapContext);
 
@@ -53,8 +54,6 @@ const useOptions = () => {
                                 default:
                                     place_type = 'place'; // country, region, post, neighberhood...
                             }
-
-                            const splitIndex = place_name.indexOf(',');
                             const arr = place_name.split(',');
                             const primary = arr[0];
                             const secondary = arr.slice(1).join(',');
@@ -83,31 +82,49 @@ const useStore = (label) => {
     const pickup = useSelector(selectPickup);
     const dropoff = useSelector(selectDropoff);
     const isPickup = /pick up/i.test(label);
-    const address = isPickup ? pickup : dropoff;
+    const addrObj = isPickup ? pickup : dropoff;
+
+    const map = useContext(MapContext);
+    useEffect(() => {
+        if (pickup?.center) {
+            const { center } = pickup;
+
+            new Marker({ color: '#0000ff' })
+                .setLngLat(center)
+                .setPopup(
+                    new Popup().setHTML(
+                        `<p>${pickup.place_name}</p>
+                        <p>GPS:${JSON.stringify(center)}</p>`
+                    )
+                )
+                .addTo(map);
+            map.flyTo({ center, zoom: 13 });
+        }
+    }, [pickup]);
 
     const dispatch = useDispatch();
-    const submitHandler = (newAddress) => {
+    const saveToStore = (newAddress) => {
         dispatch(
             isPickup ? pickupAction(newAddress) : dropoffAction(newAddress)
         );
     };
 
-    return [address, submitHandler];
+    return [addrObj?.primary, saveToStore];
 };
 
 export default function SearchBar({ label }) {
     const [value, inputValue, setValue, setInputValue, options] = useOptions();
-    const [address, submitHandler] = useStore(label);
+    const [address, saveToStore] = useStore(label);
 
     return (
         <Autocomplete
             value={value}
             onChange={(event, newValue) => {
                 setValue(newValue);
-                submitHandler(newValue);
+                saveToStore(newValue);
             }}
             inputValue={inputValue || address}
-            onInputChange={async (event, newInputValue) => {
+            onInputChange={async (event, newInputValue, reason) => {
                 setInputValue(newInputValue);
             }}
             options={options}
