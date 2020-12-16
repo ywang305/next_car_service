@@ -15,6 +15,7 @@ import {
     amber,
     deepPurple,
     deepOrange,
+    orange,
 } from '@material-ui/core/colors';
 import { Provider } from 'react-redux';
 import store from '../lib/store/configStore';
@@ -22,7 +23,7 @@ import store from '../lib/store/configStore';
 const theme = createMuiTheme({
     palette: {
         primary: teal,
-        secondary: lime,
+        secondary: orange,
     },
     typography: {
         // In Chinese and Japanese the characters are usually larger,

@@ -7,7 +7,8 @@ import {
     ListItem,
     ListItemIcon,
     ListItemText,
-    InputAdornment,
+    Tabs,
+    Tab,
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { getPlaceSuggests, getPlace } from './mbx-config';
@@ -15,6 +16,8 @@ import { MapContext } from './Map';
 import PlaceIcon from '@material-ui/icons/Public';
 import AddressIcon from '@material-ui/icons/LocationOn';
 import AirportIcon from '@material-ui/icons/Flight';
+import KeyboardIcon from '@material-ui/icons/Keyboard';
+import PinIcon from '@material-ui/icons/NotListedLocation';
 import {
     pickupAction,
     dropoffAction,
@@ -23,10 +26,8 @@ import {
 } from '../../../lib/store/reserveSlice';
 import { Marker, Popup } from 'mapbox-gl';
 
-// TODO search bar logic
 const useOptions = () => {
     const [options, setOptions] = useState([]);
-    const [value, setValue] = React.useState(null);
     const [inputValue, setInputValue] = React.useState('');
     const map = useContext(MapContext);
 
@@ -54,14 +55,9 @@ const useOptions = () => {
                                 default:
                                     place_type = 'place'; // country, region, post, neighberhood...
                             }
-                            const arr = place_name.split(',');
-                            const primary = arr[0];
-                            const secondary = arr.slice(1).join(',');
 
                             return {
                                 place_name,
-                                primary,
-                                secondary,
                                 center: { lng: center[0], lat: center[1] },
                                 place_type,
                             };
@@ -75,7 +71,7 @@ const useOptions = () => {
         return () => clearTimeout(tID);
     }, [inputValue]);
 
-    return [value, inputValue, setValue, setInputValue, options];
+    return [inputValue, setInputValue, options];
 };
 
 function createPuMarker(pickup, color = '#0000ff') {
@@ -90,100 +86,99 @@ function createDoMarker(dropoff, color = '#ff0000') {
     return createPuMarker(dropoff, color);
 }
 
-const useStore = (label) => {
+const useValue = (isPickup) => {
     const pickup = useSelector(selectPickup);
     const dropoff = useSelector(selectDropoff);
-    const isPickup = /pick up/i.test(label);
-    const addrObj = isPickup ? pickup : dropoff;
+    const value = isPickup ? pickup : dropoff;
 
     const map = useContext(MapContext);
     useEffect(() => {
-        let puMarker, doMarker;
-        if (pickup?.center && !dropoff?.center) {
-            const center = pickup.center;
+        let marker;
+        if (value) {
+            if (isPickup) {
+                marker = createPuMarker(value).addTo(map);
+            } else {
+                marker = createDoMarker(value).addTo(map);
+            }
 
-            puMarker = createPuMarker(pickup).addTo(map);
-            map.flyTo({ center, zoom: 13 });
-        } else if (!pickup?.center && dropoff?.center) {
-            const center = dropoff.center;
-            doMarker = createDoMarker(dropoff).addTo(map);
-
-            map.flyTo({ center, zoom: 13 });
-        } else if (pickup?.center && dropoff?.center) {
-            puMarker = createPuMarker(pickup).addTo(map);
-            doMarker = createDoMarker(dropoff).addTo(map);
-
-            const { lng: lngPu, lat: latPu } = pickup.center;
-            const { lng: lngDo, lat: latDo } = dropoff.center;
-            const sw = [Math.min(lngPu, lngDo), Math.min(latPu, latDo)];
-            const ne = [Math.max(lngPu, lngDo), Math.max(latPu, latDo)];
-            map.fitBounds([sw, ne], { padding: 64 });
+            if ((isPickup && !dropoff) || (!isPickup && !pickup)) {
+                map.flyTo({ center: value.center, zoom: 13 });
+            } else {
+                const { lng: lngPu, lat: latPu } = pickup.center;
+                const { lng: lngDo, lat: latDo } = dropoff.center;
+                const sw = [Math.min(lngPu, lngDo), Math.min(latPu, latDo)];
+                const ne = [Math.max(lngPu, lngDo), Math.max(latPu, latDo)];
+                map.fitBounds([sw, ne], { padding: 64 });
+            }
         }
 
-        return () => {
-            puMarker?.remove();
-            doMarker?.remove();
-        };
-    }, [pickup, dropoff]);
+        return marker?.remove;
+    }, [value]);
 
     const dispatch = useDispatch();
-    const saveToStore = (newAddress) => {
-        dispatch(
-            isPickup ? pickupAction(newAddress) : dropoffAction(newAddress)
-        );
+    const saveToStore = (event, newValue) => {
+        dispatch(isPickup ? pickupAction(newValue) : dropoffAction(newValue));
     };
 
-    return [addrObj?.primary, saveToStore];
+    return [value, saveToStore];
 };
 
 export default function SearchBar({ label }) {
-    const [value, inputValue, setValue, setInputValue, options] = useOptions();
-    const [address, saveToStore] = useStore(label);
+    const isPickup = /pick/i.test(label);
+    const [inputValue, setInputValue, options] = useOptions();
+    const [value, saveToStore] = useValue(isPickup);
 
     return (
-        <Autocomplete
-            value={value}
-            onChange={(event, newValue) => {
-                setValue(newValue);
-                saveToStore(newValue);
-            }}
-            inputValue={inputValue || address}
-            onInputChange={async (event, newInputValue, reason) => {
-                setInputValue(newInputValue);
-            }}
-            options={options}
-            getOptionLabel={(option) => {
-                return option.primary;
-            }}
-            style={{
-                backgroundColor: 'white',
-                minWidth: 300,
-            }}
-            renderInput={(params) => (
-                <TextField {...params} label={label} variant='outlined' />
-            )}
-            filterOptions={(opt) => opt}
-            renderOption={({
-                place_name,
-                primary,
-                secondary,
-                place_type,
-                center,
-            }) => {
-                console.log(place_name);
-                return (
-                    <OptionItem
-                        primary={primary}
-                        secondary={secondary}
-                        place_type={place_type}
-                    />
-                );
-            }}
-        />
+        <div>
+            <Autocomplete
+                value={value}
+                onChange={saveToStore}
+                inputValue={inputValue || value?.place_name?.split(',')[0]}
+                onInputChange={async (event, newInputValue, reason) => {
+                    setInputValue(newInputValue);
+                }}
+                options={options}
+                getOptionLabel={(option) => {
+                    return option.place_name.split(',')[0];
+                }}
+                style={{
+                    minWidth: 300,
+                }}
+                renderInput={(params) => (
+                    <TextField {...params} label={label} variant='standard' />
+                )}
+                filterOptions={(opt) => opt}
+                renderOption={({ place_name, place_type, center }) => {
+                    return (
+                        <OptionItem
+                            place_name={place_name}
+                            place_type={place_type}
+                        />
+                    );
+                }}
+            />
+            {/*  TODO: how to make pin on map to select address?  {open && <CentralMarker isPickup={isPickup} />} */}
+            {/*  TODO: need split Searchbar to 3 components :  Typing, AP, Map */}
+            <Tabs
+                value={value}
+                onChange={() => {}}
+                // variant='fullWidth'
+                indicatorColor='secondary'
+                textColor='secondary'
+                aria-label='icon label tabs example'
+            >
+                <Tab icon={<KeyboardIcon />} />
+                <Tab icon={<AirportIcon />} />
+                <Tab icon={<PinIcon />} />
+            </Tabs>
+        </div>
     );
 }
 
-const OptionItem = ({ place_type, primary = '', secondary = '' }) => {
+const OptionItem = ({ place_type, place_name }) => {
+    const parts = place_name.split(',');
+    const primary = parts[0];
+    const secondary = parts.slice(1).join(',');
     return (
         <ListItem>
             <ListItemIcon>
