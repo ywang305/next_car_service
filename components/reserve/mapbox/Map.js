@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState, createContext } from 'react';
 import Head from 'next/head';
 import styles from './map.module.css';
 import { Box } from '@material-ui/core';
-import CentralMarker from './CentralMarker';
 import { mapboxgl } from './mbx-config';
 
 export default function Map({ children }) {
@@ -19,9 +18,8 @@ export default function Map({ children }) {
             zoom: zoom,
         });
         map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
         setMap(map);
-        return map.remove;
+        return () => map?.remove();
     }, []);
     const mapContainerEl = useRef(null);
 
