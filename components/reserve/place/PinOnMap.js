@@ -10,9 +10,10 @@ import {
     selectPickup,
     selectDropoff,
 } from '../../../lib/store/reserveSlice';
-import { getPlacePrimary } from './TypeIn';
+import { getPlacePrimary } from './utils';
 import CheckIcon from '@material-ui/icons/Check';
 import { red } from '@material-ui/core/colors';
+import { PanelContext } from './SearchPanel';
 
 const usePinMap = (label) => {
     const isPickup = /pick/i.test(label);
@@ -75,6 +76,13 @@ export default function PinOnMap({ label = '' }) {
     const dropoff = useSelector(selectDropoff);
     const disabled =
         (isPickup ? pickup : dropoff)?.place_name === addrObj?.place_name;
+
+    const { completeEditing } = useContext(PanelContext);
+    const completeHandler = (e) => {
+        e.stopPropagation();
+        saveToRedux();
+        completeEditing();
+    };
     return (
         <>
             <Box
@@ -89,7 +97,7 @@ export default function PinOnMap({ label = '' }) {
                     color='secondary'
                     size='small'
                     aria-label='check'
-                    onClick={saveToRedux}
+                    onClick={completeHandler}
                     style={{ flexShrink: 0 }}
                     disabled={disabled}
                 >

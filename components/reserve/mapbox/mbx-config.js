@@ -16,7 +16,7 @@ const getPlaceSuggests = async (queryStr, center, language = 'en') => {
         );
         return response.data;
     } catch (err) {
-        console.log(err);
+        console.error(err);
     }
 };
 
@@ -31,4 +31,23 @@ const getPlace = async ({ lng, lat }, language = 'en') => {
     }
 };
 
-export { mapboxgl, getPlace, getPlaceSuggests };
+const getRoute = async (source, destination, roundtrip = false) => {
+    const optmizedUri = 'https://api.mapbox.com/optimized-trips/v1';
+    const profile = 'mapbox/driving-traffic';
+    const coordinates = [
+        [source.lng, source.lat],
+        [destination.lng, destination.lat],
+    ]
+        .map((arr) => arr.join(','))
+        .join(';');
+    try {
+        const response = await axios.get(
+            `${optmizedUri}/${profile}/${coordinates}?geometries=geojson&roundtrip=${roundtrip}&source=first&destination=last&access_token=${mapboxgl.accessToken}`
+        );
+        return response.data;
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+export { mapboxgl, getPlace, getPlaceSuggests, getRoute };

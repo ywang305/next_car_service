@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, createContext } from 'react';
 import { Box } from '@material-ui/core';
 import SearchBar from './SearchBar';
 import { useDispatch, useSelector } from 'react-redux';
-import { unwrapResult } from '@reduxjs/toolkit';
+import { nanoid, unwrapResult } from '@reduxjs/toolkit';
 import { MapContext } from '../mapbox/Map';
 import {
     pickupAction,
@@ -10,65 +10,78 @@ import {
     selectPickup,
     selectDropoff,
 } from '../../../lib/store/reserveSlice';
-import { Marker, Popup } from 'mapbox-gl';
+import { createPuMarker, createDoMarker } from './utils';
+import PlaceBar from './PlaceBar';
+import { getRoute } from '../mapbox/mbx-config';
 
 const LabelPU = 'Pick Up';
 const LabelDO = 'Drop Off';
 
-// TODO: build a display block that show place, and trigger different "tab" once clicked, using along with isUSing state
+export const PanelContext = createContext();
+
 export default function SearchPanel() {
-    const [isUsing, setIsUsing] = useState({}); // using which searchbar(label), which tab
-    usePickupDropoffDrawOnMap(isUsing);
+    const [editingLabel, setEditingLabel] = useState('');
+    const completeEditing = () => {
+        setEditingLabel('');
+    };
+    usePickupDropoffDrawOnMap(editingLabel);
 
     return (
-        <Box
-            position='absolute'
-            top={16}
-            left={16}
-            display='flex'
-            flexWrap='wrap'
-            flexDirection='column'
-            width={350}
-        >
+        <PanelContext.Provider value={{ editingLabel, completeEditing }}>
             <Box
-                p={1}
-                boxShadow={2}
-                borderRadius={16}
-                style={{ backgroundColor: 'rgba(221, 219, 255, 0.6)' }}
+                position='absolute'
+                top={16}
+                left={16}
+                display='flex'
+                flexWrap='wrap'
+                flexDirection='column'
+                width={350}
             >
-                <SearchBar
-                    label={LabelPU}
-                    isUsing={isUsing}
-                    setIsUsing={setIsUsing}
-                />
-            </Box>
+                <Box
+                    p={1}
+                    boxShadow={2}
+                    borderRadius={16}
+                    style={{ backgroundColor: 'rgba(221, 219, 255, 0.6)' }}
+                    onClick={() => setEditingLabel(LabelPU)}
+                >
+                    {editingLabel === LabelPU ? (
+                        <SearchBar label={LabelPU} />
+                    ) : (
+                        <PlaceBar label={LabelPU} />
+                    )}
+                </Box>
 
-            <Box
-                p={1}
-                mt={2}
-                boxShadow={2}
-                borderRadius={16}
-                style={{ backgroundColor: 'rgba(255, 219, 221, 0.6)' }}
-            >
-                <SearchBar
-                    label={LabelDO}
-                    isUsing={isUsing}
-                    setIsUsing={setIsUsing}
-                />
+                <Box
+                    p={1}
+                    mt={2}
+                    boxShadow={2}
+                    borderRadius={16}
+                    style={{ backgroundColor: 'rgba(255, 219, 221, 0.6)' }}
+                    onClick={() => setEditingLabel(LabelDO)}
+                >
+                    {editingLabel === LabelDO ? (
+                        <SearchBar label={LabelDO} />
+                    ) : (
+                        <PlaceBar label={LabelDO} />
+                    )}
+                </Box>
             </Box>
-        </Box>
+        </PanelContext.Provider>
     );
 }
 
-const usePickupDropoffDrawOnMap = (isUsing) => {
+const usePickupDropoffDrawOnMap = (editingLabel) => {
     // value is the addrObj
     const pickup = useSelector(selectPickup);
     const dropoff = useSelector(selectDropoff);
 
     const map = useContext(MapContext);
+
+    const [source, setSource] = useState(null);
+
     useEffect(() => {
         let puMarker, doMarker;
-        if (isUsing.tab !== 2) {
+        if (!editingLabel) {
             if (pickup && dropoff) {
                 puMarker = createPuMarker(pickup).addTo(map);
                 doMarker = createDoMarker(dropoff).addTo(map);
@@ -77,6 +90,24 @@ const usePickupDropoffDrawOnMap = (isUsing) => {
                 const sw = [Math.min(lngPu, lngDo), Math.min(latPu, latDo)];
                 const ne = [Math.max(lngPu, lngDo), Math.max(latPu, latDo)];
                 map.fitBounds([sw, ne], { padding: 64 });
+
+                (async () => {
+                    const respData = await getRoute(
+                        pickup.center,
+                        dropoff.center
+                    );
+                    const trip = respData?.trips?.[0] ?? {};
+                    const { geometry, distance, duration } = trip;
+
+                    setSource({
+                        type: 'geojson',
+                        data: {
+                            type: 'Feature',
+                            properties: {},
+                            geometry,
+                        },
+                    });
+                })();
             } else if (pickup) {
                 puMarker = createPuMarker(pickup).addTo(map);
                 map.flyTo({ center: pickup.center, zoom: 13 });
@@ -90,19 +121,70 @@ const usePickupDropoffDrawOnMap = (isUsing) => {
             puMarker?.remove();
             doMarker?.remove();
         };
-    }, [pickup, dropoff, isUsing.tab]);
+    }, [pickup, dropoff, editingLabel]);
+
+    useEffect(() => {
+        let id = nanoid();
+        if (source && map) {
+            map?.addLayer({
+                id,
+                type: 'line',
+                source,
+                layout: {
+                    'line-join': 'round',
+                    'line-cap': 'round',
+                },
+                paint: {
+                    'line-color': '#268a19',
+                    'line-opacity': 0.5,
+                    'line-width': 13,
+                    'line-blur': 0.5,
+                },
+            });
+        }
+
+        return () => {
+            try {
+                if (map?.getSource(id)) {
+                    map.removeSource(id);
+                    map.removeLayer(id);
+                }
+            } catch (err) {
+                // ok
+            }
+        };
+    }, [source, map]);
 
     return [];
 };
 
-function createPuMarker(pickup, color = '#0000ff') {
-    return new Marker({ color }).setLngLat(pickup.center).setPopup(
-        new Popup().setHTML(
-            `<p>${pickup.place_name}</p>
-            <p>${JSON.stringify(pickup.center)}</p>`
-        )
-    );
-}
-function createDoMarker(dropoff, color = '#ff0000') {
-    return createPuMarker(dropoff, color);
-}
+const drawRoute = (map, geometry) => {
+    map.addLayer({
+        id: 'route',
+        type: 'line',
+        source: {
+            type: 'geojson',
+            data: {
+                type: 'Feature',
+                properties: {},
+                geometry,
+            },
+        },
+        layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+        },
+        paint: {
+            'line-color': '#cccccc',
+            'line-opacity': 0.5,
+            'line-width': 8,
+            'line-blur': 0.5,
+        },
+    });
+};
+const removeRoute = (map) => {
+    if (map?.getSource('route')) {
+        map?.removeSource('route');
+        map?.removeLayer('route');
+    }
+};

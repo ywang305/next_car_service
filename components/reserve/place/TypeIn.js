@@ -11,8 +11,9 @@ import {
     selectPickup,
     selectDropoff,
 } from '../../../lib/store/reserveSlice';
-import { Marker, Popup } from 'mapbox-gl';
 import OptionItem from './OptionItem';
+import { getPlacePrimary } from './utils';
+import { PanelContext } from './SearchPanel';
 
 const useOptions = () => {
     const [options, setOptions] = useState([]);
@@ -62,18 +63,6 @@ const useOptions = () => {
     return [inputValue, setInputValue, options];
 };
 
-function createPuMarker(pickup, color = '#0000ff') {
-    return new Marker({ color }).setLngLat(pickup.center).setPopup(
-        new Popup().setHTML(
-            `<p>${pickup.place_name}</p>
-            <p>${JSON.stringify(pickup.center)}</p>`
-        )
-    );
-}
-function createDoMarker(dropoff, color = '#ff0000') {
-    return createPuMarker(dropoff, color);
-}
-
 const INPUT_SRC = 'TYPE_IN';
 
 const useValue = (isPickup) => {
@@ -83,7 +72,7 @@ const useValue = (isPickup) => {
     const value = isPickup ? pickup : dropoff;
 
     const dispatch = useDispatch();
-    const saveToStore = (event, newValue) => {
+    const saveToStore = (newValue) => {
         dispatch(
             isPickup
                 ? pickupAction(newValue, INPUT_SRC)
@@ -98,11 +87,17 @@ export default function TypeIn({ label }) {
     const isPickup = /pick/i.test(label);
     const [inputValue, setInputValue, options] = useOptions();
     const [value, saveToStore] = useValue(isPickup);
+    const { completeEditing } = useContext(PanelContext);
+    const completeHandler = (event, newValue) => {
+        event.stopPropagation();
+        saveToStore(newValue);
+        completeEditing();
+    };
 
     return (
         <Autocomplete
             value={value}
-            onChange={saveToStore}
+            onChange={completeHandler}
             inputValue={inputValue || getPlacePrimary(value?.place_name)}
             onInputChange={(event, newInputValue, reason) => {
                 setInputValue(newInputValue);
@@ -129,7 +124,3 @@ export default function TypeIn({ label }) {
         />
     );
 }
-
-export const getPlacePrimary = (place_name) => {
-    return place_name?.split(',').slice(0, 2).join(',');
-};
