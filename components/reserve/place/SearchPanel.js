@@ -157,34 +157,3 @@ const usePickupDropoffDrawOnMap = (editingLabel) => {
 
     return [];
 };
-
-const drawRoute = (map, geometry) => {
-    map.addLayer({
-        id: 'route',
-        type: 'line',
-        source: {
-            type: 'geojson',
-            data: {
-                type: 'Feature',
-                properties: {},
-                geometry,
-            },
-        },
-        layout: {
-            'line-join': 'round',
-            'line-cap': 'round',
-        },
-        paint: {
-            'line-color': '#cccccc',
-            'line-opacity': 0.5,
-            'line-width': 8,
-            'line-blur': 0.5,
-        },
-    });
-};
-const removeRoute = (map) => {
-    if (map?.getSource('route')) {
-        map?.removeSource('route');
-        map?.removeLayer('route');
-    }
-};
