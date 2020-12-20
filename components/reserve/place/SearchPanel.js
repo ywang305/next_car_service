@@ -7,6 +7,7 @@ import { MapContext } from '../mapbox/Map';
 import {
     pickupAction,
     dropoffAction,
+    routeAction,
     selectPickup,
     selectDropoff,
 } from '../../../lib/store/reserveSlice';
@@ -79,6 +80,8 @@ const usePickupDropoffDrawOnMap = (editingLabel) => {
 
     const [source, setSource] = useState(null);
 
+    const dispatch = useDispatch();
+
     useEffect(() => {
         let puMarker, doMarker;
         if (!editingLabel) {
@@ -98,7 +101,7 @@ const usePickupDropoffDrawOnMap = (editingLabel) => {
                     );
                     const trip = respData?.trips?.[0] ?? {};
                     const { geometry, distance, duration } = trip;
-
+                    dispatch(routeAction(distance, duration));
                     setSource({
                         type: 'geojson',
                         data: {
