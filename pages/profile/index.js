@@ -3,13 +3,10 @@ import {
     Container,
     Box,
     IconButton,
-    Divider,
-    Typography,
-    Tooltip,
     Button,
     TextField,
 } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import dynamic from 'next/dynamic';
 import Layout from '../../components/layout';
 import {
     getUserProfile,
@@ -21,21 +18,21 @@ import { auth } from '../../lib/firebase/firebase_app';
 import EditIcon from '@material-ui/icons/Edit';
 
 const useProfile = () => {
+    const [user, setUser] = useState(null);
+
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((user) => {
+        const unsubscribe = auth?.onAuthStateChanged((user) => {
             if (user) {
                 setUser(user);
             }
         });
 
-        return unsubscribe();
-    }, []);
+        return unsubscribe?.();
+    }, [auth]);
     useEffect(() => {
         setDisplayName(user?.displayName);
         setPhotoURL(user?.photoURL);
     }, [user]);
-
-    const [user, setUser] = useState(null);
 
     //displayName, email, photoURL, emailVerified, uid
     const [displayName, setDisplayName] = useState('');
@@ -83,7 +80,6 @@ export default function Profile() {
             await updatePassword(password);
         }
     };
-    const [info, setInfo] = useState('');
 
     return (
         <Layout>
