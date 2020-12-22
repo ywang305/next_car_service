@@ -67,7 +67,7 @@ const data = [
     {
         label: 'Payment',
         icon: <LocalAtmOutlined />,
-        to: '/payment',
+        to: '/pay',
     },
     {
         label: 'Trip List',

@@ -25,7 +25,6 @@ export default function Details(props) {
             display='flex'
             alignItems='center'
             style={{ overflow: 'visible' }}
-            py={1}
             color={color}
         >
             <Box display='flex' flexDirection='column' alignItems='center'>
