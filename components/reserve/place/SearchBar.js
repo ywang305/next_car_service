@@ -9,6 +9,7 @@ import PinIcon from '@material-ui/icons/NotListedLocation';
 import { withStyles } from '@material-ui/core/styles';
 import TypeIn from './TypeIn';
 import PinOnMap from './PinOnMap';
+import Airports from './Airports';
 import { PanelContext } from './SearchPanel';
 
 export default function SearchBar({ label }) {
@@ -33,7 +34,7 @@ export default function SearchBar({ label }) {
         <ClickAwayListener onClickAway={clickAwayHandler}>
             <div>
                 {[-1, 0].includes(value) && <TypeIn label={label} />}
-                {value === 1 && <div> airport </div>}
+                {value === 1 && <Airports label={label} />}
                 {value === 2 && <PinOnMap label={label} />}
                 <Tabs
                     value={value}

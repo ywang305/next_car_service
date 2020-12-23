@@ -9,7 +9,7 @@ export default function OptionItem({ place_name, place_type }) {
     const primary = parts[0];
     const secondary = parts.slice(1).join(',');
     return (
-        <ListItem>
+        <ListItem button>
             <ListItemIcon>
                 {(/address/i.test(place_type) && <AddressIcon />) ||
                     (/airport/i.test(place_type) && <AirportIcon />) || (

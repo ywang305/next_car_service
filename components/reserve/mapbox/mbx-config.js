@@ -6,13 +6,18 @@ mapboxgl.accessToken =
 
 const placesUri = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
 
-const getPlaceSuggests = async (queryStr, center, language = 'en') => {
+const getPlaceSuggests = async (
+    queryStr,
+    center,
+    limit = 5,
+    language = 'en'
+) => {
     if (queryStr.trim().length < 2) return [];
     const encodedStr = encodeURI(queryStr);
     const queryCenter = center ? `proximity=${center.lng},${center.lat}&` : '';
     try {
         const response = await axios.get(
-            `${placesUri}/${encodedStr}.json?${queryCenter}access_token=${mapboxgl.accessToken}&language=${language}`
+            `${placesUri}/${encodedStr}.json?${queryCenter}access_token=${mapboxgl.accessToken}&limit=${limit}&language=${language}`
         );
         return response.data;
     } catch (err) {
