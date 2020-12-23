@@ -125,6 +125,18 @@ const vehicles = [
         accessible: true,
         wifi: true,
     },
+    {
+        vid: 'Apple Car',
+        src: '/Apple-Car.webp',
+        passengers: 2,
+        luggages: 2,
+        price: 69,
+        ev: true,
+        accessible: false,
+        wifi: true,
+        bed: false,
+        coffee: false,
+    },
 ]
     .map((v) => {
         v.src = '/vehicles' + v.src;
