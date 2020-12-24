@@ -1,5 +1,5 @@
 
-Call your next Cyber Car from **<https://next-car-service.vercel.app>**
+Hail your next Cyber Car from **<https://next-car-service.vercel.app>**
 
 ## Getting Started
 
