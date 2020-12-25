@@ -11,6 +11,9 @@ import AccessibleIcon from '@material-ui/icons/Accessible';
 import AirlineSeatIcon from '@material-ui/icons/AirlineSeatFlatAngled';
 import WifiIcon from '@material-ui/icons/Wifi';
 import CoffeeIcon from '@material-ui/icons/LocalCafe';
+import RaceIcon from '@material-ui/icons/Speed';
+import AutoPilotIcon from '@material-ui/icons/Adb';
+
 // import Image from 'next/image';  // depdending sharp module not support for mac m1 yet
 
 export default function Details(props) {
@@ -44,11 +47,18 @@ export default function Details(props) {
             <Box>
                 <Cost cost={cost} />
                 <Box pt={1}>
-                    {props.ev && <BatteryIcon fontSize='small' />}
-                    {props.accessible && <AccessibleIcon fontSize='small' />}
-                    {props.wifi && <WifiIcon fontSize='small' />}
-                    {props.bed && <AirlineSeatIcon fontSize='small' />}
-                    {props.coffee && <CoffeeIcon fontSize='small' />}
+                    {props.ev && <BatteryIcon style={{ fontSize: iconSize }} />}
+                    {props.accessible && (
+                        <AccessibleIcon style={{ fontSize: iconSize }} />
+                    )}
+                    {props.wifi && <WifiIcon style={{ fontSize: iconSize }} />}
+                    {props.bed && (
+                        <AirlineSeatIcon style={{ fontSize: iconSize }} />
+                    )}
+                    {props.coffee && (
+                        <CoffeeIcon style={{ fontSize: iconSize }} />
+                    )}
+                    {props.race && <RaceIcon style={{ fontSize: iconSize }} />}
                 </Box>
             </Box>
         </Box>
@@ -84,3 +94,5 @@ const IconNumBox_ = ({ Icon, num, ...rest }) => {
         </Box>
     );
 };
+
+const iconSize = 16;

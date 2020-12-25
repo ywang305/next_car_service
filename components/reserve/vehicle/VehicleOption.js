@@ -61,6 +61,16 @@ const vehicles = [
         wifi: false,
         bed: false,
         coffee: false,
+        race: true,
+        auto: false,
+    },
+    {
+        vid: 'Nissan GT-R',
+        src: '/Nissan-GT-R.webp',
+        passengers: 3,
+        luggages: 1,
+        price: 34,
+        race: true,
     },
     {
         vid: 'Cybertruck',
@@ -69,6 +79,8 @@ const vehicles = [
         luggages: 10,
         price: 60,
         ev: true,
+        race: true,
+        auto: true,
     },
     {
         vid: 'Faraday FF91',
@@ -80,6 +92,8 @@ const vehicles = [
         wifi: true,
         bed: true,
         coffee: true,
+        race: true,
+        auto: true,
     },
     {
         vid: 'Kawa Ninja',
@@ -87,6 +101,7 @@ const vehicles = [
         passengers: 1,
         luggages: 0,
         price: 23,
+        race: true,
     },
     {
         vid: 'Maserati Ghibli',
@@ -94,6 +109,7 @@ const vehicles = [
         passengers: 3,
         luggages: 2,
         price: 13,
+        race: true,
     },
     {
         vid: 'Tesla X',
@@ -102,6 +118,7 @@ const vehicles = [
         luggages: 4,
         price: 19,
         ev: true,
+        auto: true,
     },
     {
         vid: 'Tesla Bus',
@@ -114,6 +131,7 @@ const vehicles = [
         wifi: true,
         bed: true,
         coffee: true,
+        auto: true,
     },
     {
         vid: 'Zoox',
@@ -124,6 +142,7 @@ const vehicles = [
         ev: true,
         accessible: true,
         wifi: true,
+        auto: true,
     },
     {
         vid: 'Apple Car',
@@ -136,6 +155,7 @@ const vehicles = [
         wifi: true,
         bed: false,
         coffee: false,
+        auto: true,
     },
 ]
     .map((v) => {

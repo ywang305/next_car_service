@@ -4,7 +4,6 @@ import {
     Box,
     Divider,
     Accordion,
-    AccordionActions,
     AccordionSummary,
     AccordionDetails,
 } from '@material-ui/core';
