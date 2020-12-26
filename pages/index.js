@@ -16,11 +16,19 @@ export default function Home() {
         <Layout>
             <div
                 style={{
-                    backgroundImage: 'url(/land/Cyberpunk-2077.jpg)',
-                    height: 'calc(100vh - 60px)',
-                    opacity: 0.8,
+                    backgroundImage: 'url(/land/CyberCarLanding.webp)',
+                    height: 1712,
+                    position: 'relative',
                 }}
-            ></div>
+            >
+                <iframe
+                    style={{ position: 'absolute', right: 16, top: 16 }}
+                    width='420'
+                    height='315'
+                    src='https://www.youtube.com/embed/qIcTM8WXFjk?autoplay=1&controls=0&start=3&end=26'
+                    frameborder='0'
+                ></iframe>
+            </div>
         </Layout>
     );
 }
