@@ -15,7 +15,7 @@ import {
     Face,
     ListOutlined,
     ExitToAppOutlined,
-    MonetizationOnOutlinedIcon,
+    MonetizationOnOutlined,
 } from '@material-ui/icons';
 import { selectIsLogin, signOutThunk } from '../../lib/store/loginSlice';
 import { useSelector, useDispatch } from 'react-redux';
