@@ -12,23 +12,15 @@ import {
 import {
     AccountCircleOutlined,
     ReplayOutlined,
-    Payment,
-    HelpOutlineOutlined,
-    ErrorOutlineOutlined,
-    ChatBubbleOutlineOutlined,
-    ExpandLess,
-    ExpandMore,
     Face,
     ListOutlined,
-    DepartureBoard,
     ExitToAppOutlined,
-    LocalAtmOutlined,
+    MonetizationOnOutlinedIcon,
 } from '@material-ui/icons';
 import { selectIsLogin, signOutThunk } from '../../lib/store/loginSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import LogoutItem from './LogoutItem';
 import { auth } from '../../lib/firebase/firebase_app';
-import Image from 'next/image';
 
 const UserPhoto = () => {
     const [name, setName] = useState(null);
@@ -66,7 +58,7 @@ const data = [
     },
     {
         label: 'Payment',
-        icon: <LocalAtmOutlined />,
+        icon: <MonetizationOnOutlinedIcon />,
         to: '/pay',
     },
     {
