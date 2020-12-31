@@ -23,10 +23,10 @@ export default function Home() {
             >
                 <iframe
                     style={{ position: 'absolute', right: 0, top: 0 }}
-                    width='50%'
-                    height='40vh'
+                    width={420}
+                    height={340}
                     src='https://www.youtube.com/embed/qIcTM8WXFjk?autoplay=1&controls=0&start=3&end=26'
-                    frameborder='0'
+                    frameBorder='0'
                 ></iframe>
             </div>
         </Layout>
