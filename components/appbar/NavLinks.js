@@ -58,7 +58,7 @@ const data = [
     },
     {
         label: 'Payment',
-        icon: <MonetizationOnOutlinedIcon />,
+        icon: <MonetizationOnOutlined />,
         to: '/pay',
     },
     {
