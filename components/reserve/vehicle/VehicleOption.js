@@ -49,7 +49,7 @@ export default function VehicleOption() {
     );
 }
 
-const vehicles = [
+export const vehicles = [
     {
         vid: 'BMW iR',
         src: '/BMW-iR.webp',

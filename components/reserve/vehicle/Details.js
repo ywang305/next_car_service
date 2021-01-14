@@ -12,7 +12,6 @@ import AirlineSeatIcon from '@material-ui/icons/AirlineSeatFlatAngled';
 import WifiIcon from '@material-ui/icons/Wifi';
 import CoffeeIcon from '@material-ui/icons/LocalCafe';
 import RaceIcon from '@material-ui/icons/Speed';
-import AutoPilotIcon from '@material-ui/icons/Adb';
 
 // import Image from 'next/image';  // depdending sharp module not support for mac m1 yet
 

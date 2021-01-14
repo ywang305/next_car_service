@@ -5,6 +5,7 @@ import Map from '../../components/reserve/mapbox/Map';
 import SearchPanel from '../../components/reserve/place/SearchPanel';
 import VehicleOption from '../../components/reserve/vehicle/VehicleOption';
 import ScheduleOption from '../../components/reserve/schedule/ScheduleOption';
+import PayOption from '../../components/reserve/pay/Summary';
 
 export default function Reserve() {
     return (
@@ -21,18 +22,15 @@ export default function Reserve() {
 
 const OptionsWrapper = () => {
     return (
-        <Box
-            position='absolute'
-            left={16}
-            bottom={16}
-            boxShadow={3}
-            width={350}
-        >
+        <Box position='absolute' left={16} bottom={16} width={350}>
             <Box mb={2}>
                 <VehicleOption />
             </Box>
             <Box mt={2}>
                 <ScheduleOption />
+            </Box>
+            <Box mt={2}>
+                <PayOption />
             </Box>
         </Box>
     );
